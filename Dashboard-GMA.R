@@ -82,11 +82,21 @@ covid19<-base1%>%
 # head(ConfHiperten)
 
 #Agrupamos por fecha y casos totales de hipertension por  dia
+# fechaHiperten<-covid19%>%
+#   group_by(FECHA_DEF)%>%
+#   filter(FECHA_DEF!=is.na(FECHA_DEF))%>%
+#   summarise(Hipertensos=sum(HIPERTENSION))%>%
+#   mutate(Nuevos=abs(Hipertensos-lag(Hipertensos)),mm7=zoo::rollmean(Hipertensos,7,align="center",fill=NA),mm14=zoo::rollmean(Hipertensos,14,align="center",fill=NA),mm7_N=zoo::rollmean(Nuevos,7,align="center",fill=NA),mm14_N=zoo::rollmean(Nuevos,14,align="center",fill=NA))
+# 
+
 fechaHiperten<-covid19%>%
   group_by(FECHA_DEF)%>%
   filter(FECHA_DEF!=is.na(FECHA_DEF))%>%
   summarise(Hipertensos=sum(HIPERTENSION))%>%
-  mutate(Nuevos=abs(Hipertensos-lag(Hipertensos)),mm7=zoo::rollmean(Hipertensos,7,align="center",fill=NA),mm14=zoo::rollmean(Hipertensos,14,align="center",fill=NA),mm7_N=zoo::rollmean(Nuevos,7,align="center",fill=NA),mm14_N=zoo::rollmean(Nuevos,14,align="center",fill=NA))
+  mutate(acumulados=cumsum(Hipertensos),Nuevos=abs(Hipertensos-lag(Hipertensos)),mm7=zoo::rollmean(Hipertensos,7,align="center",fill=NA),mm14=zoo::rollmean(Hipertensos,14,align="center",fill=NA),mm7_N=zoo::rollmean(Nuevos,7,align="center",fill=NA),mm14_N=zoo::rollmean(Nuevos,14,align="center",fill=NA))
+
+
+
 
 # head(fechaHiperten)
 #serie de tiempo con dygraph
@@ -117,26 +127,24 @@ ggplot(correlacion, aes(x=Confirmados, y=Decesos)) +
 
 ##### serie de tiempo con plotly
 
+# Casos acumulados
+plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
+  add_trace(y=~acumulados, name='Defunciones de hipertensos', mode='lines')%>%
+  add_trace(y=~mm14,mode='lines',name='mm 7 días')%>%
+  layout(xaxis = x)
+
+# Casos nuevos de defunciones presentados por día
 x <- list(
   title = "")
 plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
   add_trace(y=~Hipertensos, name='Defunciones de hipertensos', mode='lines')%>%
-  add_trace(y=~mm14,mode='lines',name='mm 7 días')%>%
+  add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
   layout(xaxis = x)
 
 
-#### Casos nuevos de defunciones presentados por día
+# Pie chart de la Republica
 
-# x <- list(
-#   title = "")
-plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
-  add_trace(y=~Nuevos, name='Nuevas defunciones por día', mode='lines')%>%
-  add_trace(y=~mm7_N,mode='lines',name='mm 7 días')%>%
-  layout(xaxis = x)
-
-#### Pie chart de la Republica
-
-#para nuestro pie chart utilizaremos la  base delinegi,en la cual se encuentran la  cantidad de personas con hipertensión y el porcentaje de ello. Para esto, combinaremos la base de Carrasco y la del Inegi filtrando por Estado.
+#para nuestro pie chart utilizaremos la  base del INEGI,en la cual se encuentran la  cantidad de personas con hipertensión y el porcentaje de ello. Para esto, combinaremos la base de Carrasco y la del Inegi filtrando por Estado.
 
 
 base2<-base1%>%
@@ -170,8 +178,8 @@ plot_ly(covinegi, labels = ~Estado, values = ~Hipertensos, type = 'pie', textinf
 
 ## Defunciones de hipertensos confirmados por zona
 
-#### Zona norte
-# 
+## Zona norte
+
 # Comprende los siguientes Estados:
 #   
 #   
@@ -282,6 +290,7 @@ plot_ly(Piecentro, x = ~Estado, y = ~Hipe, type = 'bar', name = '', marker = lis
 # Tabasco
 # Yucatán
 
+#Selección de la zona sur
 Zonasur<-covid19%>%
   filter(ENTIDAD_RES==04|ENTIDAD_RES==07|ENTIDAD_RES==12|ENTIDAD_RES==20|ENTIDAD_RES==23|ENTIDAD_RES==27|ENTIDAD_RES==31 & FECHA_DEF!=is.na(FECHA_DEF))%>%
   group_by(FECHA_DEF)%>%
@@ -289,14 +298,17 @@ Zonasur<-covid19%>%
   mutate(mm7=zoo::rollmean(Hipertensos,7,align="center",fill=NA),mm14=zoo::rollmean(Hipertensos,14,align="center",fill=NA))%>%
   filter(mm7<=50 & mm14<=50)
 
+#Evolución de decesos
 plot_ly(data=Zonasur,x=~FECHA_DEF)%>%
   add_trace(y=~Hipertensos, name='Defunciones Zona centro', mode='lines')%>%
   add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
   add_trace(y=~mm14,mode='lines',name='mm 14 días')%>%
   layout(xaxis = x)
 
+#creamos dataframe para nuestro piechart
 Piesur<-covinegi%>%
   filter(ENTIDAD_RES==04|ENTIDAD_RES==07|ENTIDAD_RES==12|ENTIDAD_RES==20|ENTIDAD_RES==23|ENTIDAD_RES==27|ENTIDAD_RES==31)
+
 
 vals4<- paste(Piesur$Hipertensos, sep = "")
 plot_ly(Piesur, labels = ~Estado, values = ~Hipertensos, type = 'pie', textinfo = "text", text = vals4) %>%

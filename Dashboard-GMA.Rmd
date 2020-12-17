@@ -116,7 +116,7 @@ fechaHiperten<-covid19%>%
   group_by(FECHA_DEF)%>%
   filter(FECHA_DEF!=is.na(FECHA_DEF))%>%
   summarise(Hipertensos=sum(HIPERTENSION))%>%
-  mutate(Nuevos=abs(Hipertensos-lag(Hipertensos)),mm7=zoo::rollmean(Hipertensos,7,align="center",fill=NA),mm14=zoo::rollmean(Hipertensos,14,align="center",fill=NA),mm7_N=zoo::rollmean(Nuevos,7,align="center",fill=NA),mm14_N=zoo::rollmean(Nuevos,14,align="center",fill=NA))
+  mutate(acumulados=cumsum(Hipertensos),Nuevos=abs(Hipertensos-lag(Hipertensos)),mm7=zoo::rollmean(Hipertensos,7,align="center",fill=NA),mm14=zoo::rollmean(Hipertensos,14,align="center",fill=NA),mm7_N=zoo::rollmean(Nuevos,7,align="center",fill=NA),mm14_N=zoo::rollmean(Nuevos,14,align="center",fill=NA))
 
 # fechaHiperten1<-covid19%>%
 #   group_by(FECHA_DEF)%>%
@@ -142,7 +142,7 @@ x <- list(
   title = "")
 plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
   add_trace(y=~Hipertensos, name='Defunciones de hipertensos', mode='lines')%>%
-  add_trace(y=~mm14,mode='lines',name='mm 7 días')%>%
+  add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
   layout(xaxis = x)
 
 ```
@@ -153,9 +153,10 @@ plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
 x <- list(
   title = "")
 plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
-  add_trace(y=~Nuevos, name='Nuevas defunciones por día', mode='lines')%>%
-  add_trace(y=~mm7_N,mode='lines',name='mm 7 días')%>%
+  add_trace(y=~acumulados, name='Defunciones de hipertensos', mode='lines')%>%
+  add_trace(y=~mm14,mode='lines',name='mm 7 días')%>%
   layout(xaxis = x)
+
 ```
 #### Pie chart de la Republica
 

@@ -1,0 +1,201 @@
+---
+title: "Decesos de hipertensos confirmados de SARS-CoV-2"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    theme: simplex
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+source("Dashboard-GMA.R")
+```
+
+Población hipertensa
+=============================
+
+Column
+---------------------------
+
+### Hipertensos  en México
+
+```{r}
+plot_ly(covinegi, labels = ~Estado, values = ~Hipe, type = 'pie', textinfo = "text", textinfo = vals1)%>%
+  layout(
+    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE),
+    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE))
+```
+
+
+### Hipertensos confirmados  en México
+
+```{r}
+plot_ly(covinegi, labels = ~Estado, values = ~Hipertensos, type = 'pie', textinfo = "text", textinfo = vals)%>%
+  layout(
+    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE),
+    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE))
+```
+
+
+Decesos México 
+=============================
+
+Column{.tabset .tabset-fade}
+------------------------------
+### Casos acumulados
+```{r}
+plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
+  add_trace(y=~acumulados, name='Defunciones de hipertensos', mode='lines')%>%
+  layout(xaxis = x)
+
+```
+
+
+### Nuevos casos diarios 
+
+```{r}
+plot_ly(data=fechaHiperten,x=~FECHA_DEF)%>%
+  add_trace(y=~Hipertensos, name='Decesos de hipertensos', mode='lines')%>%
+  add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
+  layout(xaxis = x)
+```
+
+
+### Correlación
+```{r}
+ggplot(correlacion, aes(x=Confirmados, y=Decesos)) +
+  geom_point(shape=1) 
+
+```
+
+
+Zona norte
+===============================
+
+Row
+-------------------------------------------
+
+### Evolución de decesos
+
+```{r}
+plot_ly(data=Zonanorte,x=~FECHA_DEF)%>%
+  add_trace(y=~Hipertensos, name='Decesos Zona norte', mode='lines')%>%
+  add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
+  add_trace(y=~mm14,mode='lines',name='mm 14 días')%>%
+  layout(xaxis = x)
+```
+
+
+Column
+-----------------------------
+### Hipertensos confirmados
+
+```{r}
+ 
+plot_ly(Pienorte, labels = ~Estado, values = ~Hipertensos, type = 'pie', textinfo = "text", textinfo = vals2)%>%
+  layout(
+    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE),
+    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE))
+```
+
+
+
+### Hipertensos
+```{r}
+plot_ly(Pienorte, x = ~Estado, y = ~Hipe, type = 'bar', name = '', marker = list(color = 'rgb(49,130,189)')) %>% 
+  layout(xaxis = list(title = "", tickangle = -45),
+         yaxis = list(title = ""),
+         margin = list(b = 100),
+         barmode = 'group')
+
+```
+
+
+Zona centro
+===============================
+
+Row
+-------------------------------------------
+
+### Evolución de decesos
+
+```{r}
+plot_ly(data=Zonacentro,x=~FECHA_DEF)%>%
+  add_trace(y=~Hipertensos, name='Defunciones Zona centro', mode='lines')%>%
+  add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
+  add_trace(y=~mm14,mode='lines',name='mm 14 días')%>%
+  layout(xaxis = x)
+```
+
+
+Column
+-----------------------------
+### Hipertensos confirmados
+
+```{r}
+
+ plot_ly(Piecentro, labels = ~Estado, values = ~Hipertensos, type = 'pie', textinfo = "text", textinfo = vals3)%>%
+  layout(
+    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE),
+    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE))
+```
+
+
+
+### Hipertensos
+```{r}
+plot_ly(Piecentro, x = ~Estado, y = ~Hipe, type = 'bar', name = '', marker = list(color = 'rgb(49,130,189)')) %>% 
+  layout(xaxis = list(title = "", tickangle = -45),
+         yaxis = list(title = ""),
+         margin = list(b = 100),
+         barmode = 'group')
+
+```
+
+
+
+Zona sur
+===============================
+
+Row
+-------------------------------------------
+
+### Evolución de decesos
+
+```{r}
+plot_ly(data=Zonasur,x=~FECHA_DEF)%>%
+  add_trace(y=~Hipertensos, name='Decesos Zona sur', mode='lines')%>%
+  add_trace(y=~mm7,mode='lines',name='mm 7 días')%>%
+  add_trace(y=~mm14,mode='lines',name='mm 14 días')%>%
+  layout(xaxis = x)
+```
+
+
+Column
+-----------------------------
+### Hipertensos confirmados
+
+```{r}
+
+
+plot_ly(Piesur, labels = ~Estado, values = ~Hipertensos, type = 'pie', textinfo = "text", textinfo = vals4)%>%
+  layout(
+    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE),
+    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,showline = FALSE))
+
+ 
+```
+
+
+
+### Hipertensos
+```{r}
+plot_ly(Piesur, x = ~Estado, y = ~Hipe, type = 'bar', name = '', marker = list(color = 'rgb(49,130,189)')) %>% 
+  layout(xaxis = list(title = "", tickangle = -45),
+         yaxis = list(title = ""),
+         margin = list(b = 100),
+         barmode = 'group')
+
+```
+
